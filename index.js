@@ -65,7 +65,7 @@ app.get("/completeTasks", async(req, res) => {
     const email = req.query.email;
     const query = {
         userEmail : email,
-        isCompleted: true
+        isComplete: false
     }
     const result = await tasksCollection.find(query).toArray();
     res.send(result)
@@ -88,8 +88,7 @@ app.put("/tasks/:id", async(req, res) => {
     const filter = {_id : ObjectId(id)};
     const taskText =  req.body.taskDescription;
     option = {upsert : true};
-    console.log(taskText);
-    
+
     const updatedTask = {
         $set: {
           description : taskText  
@@ -98,6 +97,41 @@ app.put("/tasks/:id", async(req, res) => {
     const result = await tasksCollection.updateOne(filter, updatedTask, option)
     res.send(result);
 })
+
+
+// Marking a task as completed
+app.put("/tasks/id", async(req, res) => {
+    const id = req.params.id;
+    const filter = {_id : ObjectId(id)};
+    const option = {upsert : true}
+    const updatedDoc = {
+        $set : {
+            isCompleted: true
+        }
+    }
+    const result = await tasksCollection.updateOne(filter, updatedDoc, option);
+    res.send(result)
+})
+
+
+// Marking tasks as not completed
+app.put("/tasks/id", async(req, res) => {
+    const id = req.params.id;
+    const filter = {_id : ObjectId(id)};
+    const option = {upsert : true}
+    const updatedDoc = {
+        $set : {
+            isCompleted: false
+        }
+    }
+    const result = await tasksCollection.updateOne(filter, updatedDoc, option);
+    res.send(result)
+})
+
+
+
+
+
 
     }
 
