@@ -10,7 +10,7 @@ app.use(express.json());
 
 
 //Connecting to mongoDB
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.v1rp4a3.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
@@ -60,6 +60,44 @@ app.get("/myTasks", async(req, res) => {
 })
 
 
+// Loading completed tasks of a user
+app.get("/completeTasks", async(req, res) => {
+    const email = req.query.email;
+    const query = {
+        userEmail : email,
+        isCompleted: true
+    }
+    const result = await tasksCollection.find(query).toArray();
+    res.send(result)
+})
+
+
+
+
+// Deleting one task from database
+app.delete("/tasks/:id", async(req, res) => {
+    const id = req.params.id;
+    const query = {_id: ObjectId(id)};
+    const result = await tasksCollection.deleteOne(query);
+    res.send(result)
+})
+
+// Editing a task
+app.put("/tasks/:id", async(req, res) => {
+    const id = req.params.id;
+    const filter = {_id : ObjectId(id)};
+    const taskText =  req.body.taskDescription;
+    option = {upsert : true};
+    console.log(taskText);
+    
+    const updatedTask = {
+        $set: {
+          description : taskText  
+        },
+    }
+    const result = await tasksCollection.updateOne(filter, updatedTask, option)
+    res.send(result);
+})
 
     }
 
