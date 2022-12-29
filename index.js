@@ -105,9 +105,6 @@ app.patch("/taskComment/:id", async(req, res) => {
     const id = req.params.id;
     const filter = {_id : ObjectId(id)};
     const newComment =  req.body.taskComment;
-   
-    console.log(req.body);
-    
     const commentedTask = {
         $set: {
           comment : newComment
@@ -124,8 +121,7 @@ app.patch("/taskComment/:id", async(req, res) => {
 // Marking a task as completed
 app.put("/tasks/doneTasks/:id", async(req, res) => {
     const id = req.params.id;
-    console.log(id);
-    
+
     const filter = {_id : ObjectId(id)};
     const option = {upsert : true}
     const updatedDoc = {
