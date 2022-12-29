@@ -48,11 +48,12 @@ app.get("/tasks", async(req, res) => {
 })
 
 
-// Loading user review using email
+// Loading users uncompleted tasks from db  using email
 app.get("/myTasks", async(req, res) => {
     const email = req.query.email;
     const query = {
-        userEmail : email
+        userEmail : email,
+        isComplete: false
     }
     const cursor = tasksCollection.find(query);
     const tasks = await cursor.toArray();
@@ -65,7 +66,7 @@ app.get("/completeTasks", async(req, res) => {
     const email = req.query.email;
     const query = {
         userEmail : email,
-        isComplete: false
+        isComplete: true
     }
     const result = await tasksCollection.find(query).toArray();
     res.send(result)
@@ -100,13 +101,15 @@ app.put("/tasks/:id", async(req, res) => {
 
 
 // Marking a task as completed
-app.put("/tasks/id", async(req, res) => {
+app.put("/tasks/doneTasks/:id", async(req, res) => {
     const id = req.params.id;
+    console.log(id);
+    
     const filter = {_id : ObjectId(id)};
     const option = {upsert : true}
     const updatedDoc = {
         $set : {
-            isCompleted: true
+            isComplete: true
         }
     }
     const result = await tasksCollection.updateOne(filter, updatedDoc, option);
@@ -115,13 +118,13 @@ app.put("/tasks/id", async(req, res) => {
 
 
 // Marking tasks as not completed
-app.put("/tasks/id", async(req, res) => {
+app.put("/tasks/notDoneTasks/:id", async(req, res) => {
     const id = req.params.id;
     const filter = {_id : ObjectId(id)};
     const option = {upsert : true}
     const updatedDoc = {
         $set : {
-            isCompleted: false
+            isComplete: false
         }
     }
     const result = await tasksCollection.updateOne(filter, updatedDoc, option);
